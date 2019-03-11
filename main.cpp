@@ -232,6 +232,7 @@ int main(int argc, char const *argv[])
             }
         }
     }
+    //test
 
     // for(int i = 0; i < (sizeof(dayPatients)/sizeof(*dayPatients)); i++)
     // {
