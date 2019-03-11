@@ -19,41 +19,19 @@ class Patient
 
 void Patient::SetFirstJobValues()
 {
-    const int minHour = 9;
-    const int maxHour = 11;
+    hour[0] = rand() % 3 + 9;
+
     int minutes[4] = {0, 15, 30, 45};
-
-    random_device randDev;
-    mt19937 generator(randDev());
-    uniform_int_distribution<int> hourDistr(minHour, maxHour);
-
-    hour[0] = hourDistr(generator);
-
-    random_device minRandDev;
-    mt19937 minGenerator(randDev());
-    uniform_int_distribution<int> minDistr(0, sizeof(minutes)/sizeof(*minutes));
-
-    int i = minDistr(minGenerator);
+    int i = rand() % 4;
     minute[0] = minutes[i];
 }
 
 void Patient::SetSecondJobValues()
 {
-    const int minHour = 12;
-    const int maxHour = 14;
+    hour[1] = rand() % 3 + 12;
+
     int minutes[4] = {0, 15, 30, 45};
-
-    std::random_device randDev;
-    std::mt19937 generator(randDev());
-    std::uniform_int_distribution<int> hourDistr(minHour, maxHour);
-
-    hour[1] = hourDistr(generator);
-
-    random_device minRandDev;
-    mt19937 minGenerator(randDev());
-    uniform_int_distribution<int> minDistr(0, sizeof(minutes)/sizeof(*minutes));
-
-    int i = minDistr(minGenerator);
+    int i = rand() % 4;
     minute[1] = minutes[i];
 }
 
