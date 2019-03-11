@@ -202,28 +202,5 @@ int main(int argc, char const *argv[])
             }
         }
     }
-
-    // for(int i = 0; i < (sizeof(dayPatients)/sizeof(*dayPatients)); i++)
-    // {
-    //     Patient patient = dayPatients[i];
-    //     cout<< "----------------- Patient " << i+1 << "-----------------" << endl;
-    //
-    //     for(int j = 0; j < (sizeof(patient.GetJobHours()) / sizeof(*patient.GetJobHours())); j++)
-    //     {
-    //         cout<< "---------- Job " << j+1 << " ----------" << std::endl;
-    //         cout<< "Hour: " << patient.GetJobHours()[j] << " Minute: " <<patient.GetJobMinutes()[j] << endl;
-    //
-    //         if(j > 0)
-    //         {
-    //           cout<<"Total duration: " << patient.GetDuration() << endl;
-    //         }
-    //
-    //         cout<< endl;
-    //     }
-    // }
-    // PrintArray(dayPatients, (sizeof(dayPatients)/sizeof(*dayPatients))-1);
-    // cout << "Longest patient time: " << dayPatients[0].GetDuration() << endl;
-    // cout << "Shortest patient time: " << dayPatients[(sizeof(dayPatients)/sizeof(*dayPatients))-1].GetDuration() << endl;
-
     return 0;
 }
