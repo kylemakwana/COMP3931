@@ -142,14 +142,6 @@ void QuickSort(Patient array[], int low, int high)
     }
 }
 
-void PrintArray(Patient arr[], int size)
-{
-    for (int i = 0; i < size; i++)
-    {
-        cout << arr[i].GetDuration() << endl;
-    }
-}
-
 int main(int argc, char const *argv[])
 {
     int numPatients = 10;
@@ -210,7 +202,6 @@ int main(int argc, char const *argv[])
             }
         }
     }
-    //test
 
     // for(int i = 0; i < (sizeof(dayPatients)/sizeof(*dayPatients)); i++)
     // {
