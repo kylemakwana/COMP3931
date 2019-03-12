@@ -48,8 +48,8 @@ double Patient::GetDuration()
 
     if(totalMinutes < 0)
     {
-      totalHours -= 1;
-      totalMinutes = 60 + totalMinutes;
+        totalHours -= 1;
+        totalMinutes = 60 + totalMinutes;
     }
 
     double total = totalHours + (totalMinutes / 60);
@@ -59,17 +59,35 @@ double Patient::GetDuration()
 class Machine
 {
     Patient* machinePatients;
+    void IncreaseArraySize();
     public:
-      bool IsFree(Patient);
-      void AddPatient(Patient);
-      Patient* GetPatients(){return machinePatients;}
-      int NumPatients(){return (sizeof(machinePatients) / sizeof(*machinePatients));}
+        bool IsFree(Patient);
+        void AddPatient(Patient);
+        Patient* GetPatients(){return machinePatients;}
+        int NumPatients(){return (sizeof(machinePatients) / sizeof(*machinePatients));}
 };
+
+void Machine::IncreaseArraySize()
+{
+    int size = sizeof(machinePatients) / sizeof(*machinePatients);
+    Patient* newArray = new Patient[size+1];
+
+    for(int i = 0; i < size; ++i)
+    {
+        newArray[i] = machinePatients[i];
+    }
+
+    // newArray[size] =
+    machinePatients = newArray;
+}
 
 void Machine::AddPatient(Patient patient)
 {
     int numPatients = NumPatients();
+    cout << numPatients << endl;
+    IncreaseArraySize();
     machinePatients[numPatients] = patient;
+    cout << NumPatients() << endl;
 }
 
 bool Machine::IsFree(Patient patient)
@@ -167,12 +185,14 @@ int main(int argc, char const *argv[])
         patient.SetJobValues();
 
         dayPatients[i] = patient;
+        // cout << dayPatients[i].GetDuration() << endl; //--CORRECT
     }
 
     for(int i = 0; i < numMachines; i++)
     {
         Machine machine;
         dayMachines[i] = machine;
+        // cout << dayMachines[i].NumPatients() << endl; //--CORRECT
     }
 
     QuickSort(dayPatients, 0, (sizeof(dayPatients)/sizeof(*dayPatients))-1);
@@ -183,8 +203,12 @@ int main(int argc, char const *argv[])
 
         if(curMachine.IsFree(dayPatients[i]))
         {
+            cout << "Machine free, adding patient" << endl;
             curMachine.AddPatient(dayPatients[i]);
+            cout << "Added patient!" << endl;
         }
+
+        cout << curMachine.NumPatients() << endl;
     }
 
     for(int i = 0; i < numMachines; i++)
