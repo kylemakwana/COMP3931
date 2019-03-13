@@ -37,15 +37,31 @@ class Machine(object):
     #---------------------------------------------
     def isFree(self, Patient):
         patientHours, patientMinutes = Patient.getJobs()
+        #machineHours, machineMinutes = []
+        i = 0
+
+        #for i in range(len(self.machinePatients)):
+            #machineHours.append()
 
         for i in range(len(self.machinePatients)):
-            machineHours[i], machineMinutes[i] = self.machinePatients[i].getJobs()
+            machineHours, machineMinutes = self.machinePatients[i].getJobs()
+            j = 0
 
-            for j in range(0, 2):
-                if(patientHours[j] == machineHours[j] and patientMinutes[j] == machineMinutes[j]):
+            for j in range(len(patientHours)):
+                if patientHours[j] == machineHours[j] and patientMinutes[j] == machineMinutes[j]:
+                    print("CLASH ---- J{} ---- PH: {} PM: {} MH: {} MM: {}".format(j+1, patientHours[j], patientMinutes[j], machineHours[j], machineMinutes[j]))
+
+                    if j == 0:
+                        print("J{} ---- PH: {} PM: {} MH: {} MM: {}".format(j+1, patientHours[j+1], patientMinutes[j+1], machineHours[j+1], machineMinutes[j+1]))
+
+                    else:
+                        print("J{} ---- PH: {} PM: {} MH: {} MM: {}".format(j, patientHours[j-1], patientMinutes[j-1], machineHours[j], machineMinutes[j-1]))
                     return False
 
         return True
+
+    #def canShiftPatient(self, Patient):
+
 
     def numPatients(self):
         return len(self.machinePatients)
@@ -104,11 +120,17 @@ for i in range(numMachines):
 
 quickSort(dayPatients, 0, numPatients - 1)
 
-for i in range(numMachines):
-    curMachine = dayMachines[i]
+for i in range(numPatients):
+    j = i % numMachines
+    curMachine = dayMachines[j]
 
     if curMachine.isFree(dayPatients[i]):
         curMachine.addPatient(dayPatients[i]);
+
+    else:
+        #curMachine.canShiftPatient
+        #j = i
+        print("Cannot add there is a clash")
 
 for i in range(numMachines):
     machine = dayMachines[i]
