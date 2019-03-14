@@ -30,24 +30,74 @@ class Machine(object):
     def __init__(self):
         self.machinePatients = []
 
-    #---------------------------------------------
+    def canShiftPatient(self, Patient, patientPos, jobPos):
+        patientHours, patientMinutes = Patient.getJobs()
+        machineHours, machineMinutes = [], []
 
-    #EXPAND UPON THIS TRYING TO CHANGE TIME AND MOVE PATIENTS ABOUT
+        for i in range(len(self.machinePatients)):
+            hours, minutes = self.machinePatients[i].getJobs()
+            machineHours.append(hours)
+            machineMinutes.append(minutes)
 
-    #---------------------------------------------
+        clashHour, clashMinute = machineHours[patientPos][jobPos], machineMinutes[patientPos][jobPos] #hour and minute of clash
+        clash = True
+
+        if clashHour < 12: #clash happens in the morning
+            maxHour = 11
+            minHour = 9
+        else:
+            maxHour = 2
+            minHour = 12
+
+        while(clash):
+            clashMinute -= 15
+            if clashMinute < 0:
+                clashMinute = 45
+                clashHour -= 1
+
+            if not any((hour == clashHour for hour in machineHours) and (minute == clashMinute for minute in machineMinutes)):
+                print("Solution found going backwards:")
+                clash = False
+
+            if clashHour < minHour:
+                break
+
+        if not clash:
+            print("{}:{}".format(clashHour, clashMinute))
+            return True, clashHour, clashMinute
+
+        clashHour, clashMinute = machineHours[pos], machineMinutes[pos] #reset the values since we couldn't find a space in one direction
+
+        if clash:
+            while(clash):
+                clashHour += 15
+                if clashMinute == 60:
+                    clashMinute = 0
+                    clashHour += 1
+
+                    if not any((hour == clashHour for hour in machineHours) and (minute == clashMinute for minute in machineMinutes)):
+                        print("Solution found going forwards:")
+                        clash = False
+
+                    if clashHour > maxHour:
+                        break
+
+            if clash:
+                print("No solution found, try next nurse")
+                return False #Cannot find a space for the patient so try next machine
+
+            print("{}:{}".format(clashHour, clashMinute))
+            return True, clashHour, clashMinute
+
     def isFree(self, Patient):
         patientHours, patientMinutes = Patient.getJobs()
-        #machineHours, machineMinutes = []
         i = 0
-
-        #for i in range(len(self.machinePatients)):
-            #machineHours.append()
 
         for i in range(len(self.machinePatients)):
             machineHours, machineMinutes = self.machinePatients[i].getJobs()
             j = 0
 
-            for j in range(len(patientHours)):
+            for i in range(len(patientHours)):
                 if patientHours[j] == machineHours[j] and patientMinutes[j] == machineMinutes[j]:
                     print("CLASH ---- J{} ---- PH: {} PM: {} MH: {} MM: {}".format(j+1, patientHours[j], patientMinutes[j], machineHours[j], machineMinutes[j]))
 
@@ -55,13 +105,14 @@ class Machine(object):
                         print("J{} ---- PH: {} PM: {} MH: {} MM: {}".format(j+1, patientHours[j+1], patientMinutes[j+1], machineHours[j+1], machineMinutes[j+1]))
 
                     else:
-                        print("J{} ---- PH: {} PM: {} MH: {} MM: {}".format(j, patientHours[j-1], patientMinutes[j-1], machineHours[j], machineMinutes[j-1]))
+                        print("J{} ---- PH: {} PM: {} MH: {} MM: {}".format(j+1, patientHours[j-1], patientMinutes[j-1], machineHours[j-1], machineMinutes[j-1]))
+
+                    print("\nTrying to fix clash...")
+                    self.canShiftPatient(Patient, i, j)
+
                     return False
 
         return True
-
-    #def canShiftPatient(self, Patient):
-
 
     def numPatients(self):
         return len(self.machinePatients)
@@ -73,22 +124,32 @@ class Machine(object):
     def getPatients(self):
         return self.machinePatients
 
-def partition(list, low, high):
+    #def sortPatients(self, job):
+        #quickSort(self.machinePatients, 0, len(self.machinePatients) - 1, True, job)
+
+
+def partition(list, low, high, time = False, job = 0):
     i = low - 1
     pivot = list[high]
 
     for j in range(low, high):
-        if list[j].getDuration() >= pivot.getDuration(): #Change inequality sign to reverse the list
-            i = i + 1
-            list[i], list[j] = list[j], list[i]
+        if not time:
+            if list[j].getDuration() >= pivot.getDuration(): #Change inequality sign to reverse the list
+                i = i + 1
+                list[i], list[j] = list[j], list[i]
+
+        else:
+            if list[j].getJobs()[job] <= pivot.getJobs()[job]:
+                i = i + 1
+                list[i], list[j] = list[j], list[i]
 
     list[i+1], list[high] = list[high], list[i+1]
     return (i + 1)
 
 #Sorts the patients out into descending order of length of time required
-def quickSort(list, low, high):
+def quickSort(list, low, high, time = False, job = 0):
     if low < high:
-        pi = partition(list, low, high)
+        pi = partition(list, low, high, time, job)
 
         quickSort(list, low, pi - 1)
         quickSort(list, pi + 1, high)
