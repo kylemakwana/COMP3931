@@ -34,6 +34,7 @@ class Machine(object):
         patientHours, patientMinutes = Patient.getJobs()
         machineHours, machineMinutes = [], []
 
+        #Create lists of the machines patients for the day
         for i in range(len(self.machinePatients)):
             hours, minutes = self.machinePatients[i].getJobs()
             machineHours.append(hours)
@@ -42,32 +43,35 @@ class Machine(object):
         clashHour, clashMinute = machineHours[patientPos][jobPos], machineMinutes[patientPos][jobPos] #hour and minute of clash
         clash = True
 
-        if clashHour < 12: #clash happens in the morning
+        if clashHour < 12:  #clash happens in the morning
             maxHour = 11
             minHour = 9
-        else:
+        else:               #clash happens in the afternoon
             maxHour = 2
             minHour = 12
 
+        #Try going backwards to fix clash and fit into machine timetable
         while(clash):
             clashMinute -= 15
             if clashMinute < 0:
                 clashMinute = 45
                 clashHour -= 1
 
+            if clashHour < minHour:
+                break
+
+            #Solution found
             if not any((hour == clashHour for hour in machineHours) and (minute == clashMinute for minute in machineMinutes)):
                 print("Solution found going backwards:")
                 clash = False
-
-            if clashHour < minHour:
-                break
 
         if not clash:
             print("{}:{}".format(clashHour, clashMinute))
             return True, clashHour, clashMinute
 
-        clashHour, clashMinute = machineHours[pos], machineMinutes[pos] #reset the values since we couldn't find a space in one direction
+        clashHour, clashMinute = machineHours[patientPos][jobPos], machineMinutes[patientPos][jobPos] #reset the values since we couldn't find a space in one direction
 
+        #No solution found going backwards so try going forwards instead
         if clash:
             while(clash):
                 clashHour += 15
@@ -75,13 +79,15 @@ class Machine(object):
                     clashMinute = 0
                     clashHour += 1
 
-                    if not any((hour == clashHour for hour in machineHours) and (minute == clashMinute for minute in machineMinutes)):
-                        print("Solution found going forwards:")
-                        clash = False
+                if clashHour > maxHour:
+                    break
 
-                    if clashHour > maxHour:
-                        break
+                #Solution found
+                if not any((hour == clashHour for hour in machineHours) and (minute == clashMinute for minute in machineMinutes)):
+                    print("Solution found going forwards:")
+                    clash = False
 
+            #No solution found for this machine
             if clash:
                 print("No solution found, try next nurse")
                 return False #Cannot find a space for the patient so try next machine
@@ -97,7 +103,7 @@ class Machine(object):
             machineHours, machineMinutes = self.machinePatients[i].getJobs()
             j = 0
 
-            for i in range(len(patientHours)):
+            for j in range(len(patientHours)):
                 if patientHours[j] == machineHours[j] and patientMinutes[j] == machineMinutes[j]:
                     print("CLASH ---- J{} ---- PH: {} PM: {} MH: {} MM: {}".format(j+1, patientHours[j], patientMinutes[j], machineHours[j], machineMinutes[j]))
 
@@ -120,36 +126,43 @@ class Machine(object):
     def addPatient(self, Patient):
         numberOfPatients = self.numPatients()
         self.machinePatients.append(Patient)
+        self.sortPatients(0)
 
     def getPatients(self):
         return self.machinePatients
 
-    #def sortPatients(self, job):
-        #quickSort(self.machinePatients, 0, len(self.machinePatients) - 1, True, job)
+    #----------------------------------------------------------------------------
+    #Sort out patients trying to move them all to be from 9 - 12
+    #Check to see if possible (afternoon job may be before 12, not allowed!)
+    #----------------------------------------------------------------------------
+    def sortPatients(self, job):
+        machineHours, machineMinutes = [], []
+        for i in range(len(self.machinePatients)):
+            tempH, tempM = self.machinePatients[i].getJobs()
+            machineHours.append(tempH)
+            machineMinutes.append(tempM)
+
+        for i in range(len(self.machinePatients)):
+            print("J1 -- {}:{}, J2 -- {}:{}".format(machineHours[i][0], machineMinutes[i][0], machineHours[i][1], machineMinutes[i][1]))
 
 
-def partition(list, low, high, time = False, job = 0):
+
+def partition(list, low, high):
     i = low - 1
     pivot = list[high]
 
     for j in range(low, high):
-        if not time:
-            if list[j].getDuration() >= pivot.getDuration(): #Change inequality sign to reverse the list
-                i = i + 1
-                list[i], list[j] = list[j], list[i]
-
-        else:
-            if list[j].getJobs()[job] <= pivot.getJobs()[job]:
-                i = i + 1
-                list[i], list[j] = list[j], list[i]
+        if list[j].getDuration() >= pivot.getDuration(): #Change inequality sign to reverse the list
+            i = i + 1
+            list[i], list[j] = list[j], list[i]
 
     list[i+1], list[high] = list[high], list[i+1]
     return (i + 1)
 
 #Sorts the patients out into descending order of length of time required
-def quickSort(list, low, high, time = False, job = 0):
+def quickSort(list, low, high):
     if low < high:
-        pi = partition(list, low, high, time, job)
+        pi = partition(list, low, high)
 
         quickSort(list, low, pi - 1)
         quickSort(list, pi + 1, high)
@@ -157,7 +170,6 @@ def quickSort(list, low, high, time = False, job = 0):
 # --------------------------------------------------
 #                    MAIN METHOD
 # --------------------------------------------------
-
 numPatients = 10
 numMachines = 2
 dayPatients = []
