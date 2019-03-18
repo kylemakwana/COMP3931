@@ -69,6 +69,7 @@ class Machine(object):
             print("{}:{}".format(clashHour, clashMinute))
             return True, clashHour, clashMinute
 
+        #Reset values back
         clashHour, clashMinute = machineHours[patientPos][jobPos], machineMinutes[patientPos][jobPos] #reset the values since we couldn't find a space in one direction
 
         #No solution found going backwards so try going forwards instead
@@ -89,7 +90,7 @@ class Machine(object):
 
             #No solution found for this machine
             if clash:
-                print("No solution found, try next nurse")
+                print("No solution found, try next machine")
                 return False #Cannot find a space for the patient so try next machine
 
             print("{}:{}".format(clashHour, clashMinute))
@@ -111,10 +112,19 @@ class Machine(object):
                         print("J{} ---- PH: {} PM: {} MH: {} MM: {}".format(j+1, patientHours[j+1], patientMinutes[j+1], machineHours[j+1], machineMinutes[j+1]))
 
                     else:
-                        print("J{} ---- PH: {} PM: {} MH: {} MM: {}".format(j+1, patientHours[j-1], patientMinutes[j-1], machineHours[j-1], machineMinutes[j-1]))
+                        print("J{} ---- PH: {} PM: {} MH: {} MM: {}".format(j, patientHours[j-1], patientMinutes[j-1], machineHours[j-1], machineMinutes[j-1]))
 
                     print("\nTrying to fix clash...")
-                    self.canShiftPatient(Patient, i, j)
+                    canShift, newHour, newMinute = self.canShiftPatient(Patient, i, j)
+
+                    if canShift:
+                        print("FIXED")
+                        print("old time -- {}:{}".format(Patient.hour[j], Patient.minute[j]))
+                        Patient.hour[j] = newHour
+                        Patient.minute[j] = newMinute
+
+                        print("new time -- {}:{}".format(Patient.hour[j], Patient.minute[j]))
+                        return True
 
                     return False
 
@@ -144,6 +154,7 @@ class Machine(object):
 
         for i in range(len(self.machinePatients)):
             print("J1 -- {}:{}, J2 -- {}:{}".format(machineHours[i][0], machineMinutes[i][0], machineHours[i][1], machineMinutes[i][1]))
+            #while()
 
 
 
