@@ -30,6 +30,12 @@ class Machine(object):
     def __init__(self):
         self.machinePatients = []
 
+    #--------------------------------------------------------------------------------
+    #
+    #                           NOT FINISHED YET
+    #
+    #--------------------------------------------------------------------------------
+
     def canShiftPatient(self, Patient, patientPos, jobPos):
         patientHours, patientMinutes = Patient.getJobs()
         machineHours, machineMinutes = [], []
@@ -96,6 +102,11 @@ class Machine(object):
             print("{}:{}".format(clashHour, clashMinute))
             return True, clashHour, clashMinute
 
+    #--------------------------------------------------------------------------------
+    #
+    #                           NOT FINISHED YET
+    #
+    #--------------------------------------------------------------------------------
     def isFree(self, Patient):
         patientHours, patientMinutes = Patient.getJobs()
         i = 0
@@ -154,7 +165,9 @@ class Machine(object):
 
         for i in range(len(self.machinePatients)):
             print("J1 -- {}:{}, J2 -- {}:{}".format(machineHours[i][0], machineMinutes[i][0], machineHours[i][1], machineMinutes[i][1]))
-            #while()
+
+            j = 0
+            #for j in range(len())
 
 
 
@@ -208,7 +221,7 @@ for i in range(numPatients):
     j = i % numMachines
     curMachine = dayMachines[j]
 
-    if curMachine.isFree(dayPatients[i]):
+    #if curMachine.isFree(dayPatients[i]):
         curMachine.addPatient(dayPatients[i]);
 
     else:
