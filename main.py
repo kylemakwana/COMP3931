@@ -1,5 +1,11 @@
 import random, sys
 
+#--------------------------------------------------------------------------------
+#
+#                           PATIENT CLASS
+#
+#--------------------------------------------------------------------------------
+
 class Patient(object):
     def __init__(self):
         self.hour = []
@@ -25,6 +31,12 @@ class Patient(object):
 
         total = totalHours + (totalMinutes/60.0)
         return total
+
+#--------------------------------------------------------------------------------
+#
+#                           MACHINE CLASS
+#
+#--------------------------------------------------------------------------------
 
 class Machine(object):
     def __init__(self):
@@ -125,17 +137,17 @@ class Machine(object):
                     else:
                         print("J{} ---- PH: {} PM: {} MH: {} MM: {}".format(j, patientHours[j-1], patientMinutes[j-1], machineHours[j-1], machineMinutes[j-1]))
 
-                    print("\nTrying to fix clash...")
-                    canShift, newHour, newMinute = self.canShiftPatient(Patient, i, j)
+                    #print("\nTrying to fix clash...")
+                    #canShift, newHour, newMinute = self.canShiftPatient(Patient, i, j)
 
-                    if canShift:
-                        print("FIXED")
-                        print("old time -- {}:{}".format(Patient.hour[j], Patient.minute[j]))
-                        Patient.hour[j] = newHour
-                        Patient.minute[j] = newMinute
+                    #if canShift:
+                        #print("FIXED")
+                        #print("old time -- {}:{}".format(Patient.hour[j], Patient.minute[j]))
+                        #Patient.hour[j] = newHour
+                        #Patient.minute[j] = newMinute
 
-                        print("new time -- {}:{}".format(Patient.hour[j], Patient.minute[j]))
-                        return True
+                        #print("new time -- {}:{}".format(Patient.hour[j], Patient.minute[j]))
+                        #return True
 
                     return False
 
@@ -147,30 +159,15 @@ class Machine(object):
     def addPatient(self, Patient):
         numberOfPatients = self.numPatients()
         self.machinePatients.append(Patient)
-        self.sortPatients(0)
 
     def getPatients(self):
         return self.machinePatients
 
-    #----------------------------------------------------------------------------
-    #Sort out patients trying to move them all to be from 9 - 12
-    #Check to see if possible (afternoon job may be before 12, not allowed!)
-    #----------------------------------------------------------------------------
-    def sortPatients(self, job):
-        machineHours, machineMinutes = [], []
-        for i in range(len(self.machinePatients)):
-            tempH, tempM = self.machinePatients[i].getJobs()
-            machineHours.append(tempH)
-            machineMinutes.append(tempM)
-
-        for i in range(len(self.machinePatients)):
-            print("J1 -- {}:{}, J2 -- {}:{}".format(machineHours[i][0], machineMinutes[i][0], machineHours[i][1], machineMinutes[i][1]))
-
-            j = 0
-            #for j in range(len())
-
-
-
+#--------------------------------------------------------------------------------
+#
+#                           MAIN FUNCTIONS
+#
+#--------------------------------------------------------------------------------
 def partition(list, low, high):
     i = low - 1
     pivot = list[high]
@@ -190,6 +187,30 @@ def quickSort(list, low, high):
 
         quickSort(list, low, pi - 1)
         quickSort(list, pi + 1, high)
+
+#----------------------------------------------------------------------------
+#Sort out patients trying to move them all to be from 9 - 12 or as early
+#as possible if restricted by afternoon time
+#----------------------------------------------------------------------------
+def sortPatientTimes(patients):
+    for i in range(len(patients)):
+        curPatient = patients[i]
+        tempHours, tempMinutes = curPatient.getJobs()
+        print("Times changed from: {}:{} - {}:{}".format(tempHours[0], tempMinutes[0], tempHours[1], tempMinutes[1]))
+
+        while not((tempHours[0] == 9 and tempMinutes[0] == 0) or (tempHours[1] == 12 and tempMinutes[1] == 0)): #Jobs can be moved, not at the minimum
+            tempMinutes[0] -= 15
+            tempMinutes[1] -= 15
+
+            if tempMinutes[0] < 0:
+                tempMinutes[0] = 45
+                tempHours[0] -= 1
+
+            if tempMinutes[1] < 0:
+                tempMinutes[1] = 45
+                tempHours[1] -= 1
+
+        print("to {}:{} - {}:{}".format(tempHours[0], tempMinutes[0], tempHours[1], tempMinutes[1]))
 
 # --------------------------------------------------
 #                    MAIN METHOD
@@ -215,19 +236,20 @@ for i in range(numPatients):
 for i in range(numMachines):
     dayMachines.append(Machine()) #Add machine to the list of total machines for the day
 
-quickSort(dayPatients, 0, numPatients - 1)
+quickSort(dayPatients, 0, numPatients - 1) #Sort patients by the total length of jobs decreasing
+sortPatientTimes(dayPatients)
 
 for i in range(numPatients):
     j = i % numMachines
     curMachine = dayMachines[j]
 
     #if curMachine.isFree(dayPatients[i]):
-        curMachine.addPatient(dayPatients[i]);
+    curMachine.addPatient(dayPatients[i]);
 
-    else:
+    #else:
         #curMachine.canShiftPatient
         #j = i
-        print("Cannot add there is a clash")
+        #print("Cannot add there is a clash")
 
 for i in range(numMachines):
     machine = dayMachines[i]
