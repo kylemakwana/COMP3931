@@ -7,10 +7,17 @@ import random, sys
 #--------------------------------------------------------------------------------
 
 class Patient(object):
+    #--------------------------------------------------------------------------------
+    # Initialises the patient with an empty hour list and an empty minute list
+    #--------------------------------------------------------------------------------
     def __init__(self):
         self.hour = []
         self.minute = []
 
+    #--------------------------------------------------------------------------------
+    # Randomly chooses the times for the patients jobs
+    # Chooses a job for the morning and a job for the afternoon
+    #--------------------------------------------------------------------------------
     def setJobValues(self):
         self.hour.append(random.randint(9, 11))
         self.minute.append(random.randint(0, 3) * 15)
@@ -18,9 +25,23 @@ class Patient(object):
         self.hour.append(random.randint(12, 14))
         self.minute.append(random.randint(0, 3) * 15)
 
+    #--------------------------------------------------------------------------------
+    # Overwrites the patient job times with new ones that don't clash with a
+    # different patient's job times in the machine's list
+    #--------------------------------------------------------------------------------
+    def overrideJobValues(self, firstJobHour, firstJobMin, secJobHour, secJobMin):
+        self.hour[0], self.minute[0] = firstJobHour, firstJobMin
+        self.hour[1], self.minute[1] = secJobHour, secJobMin
+
+    #--------------------------------------------------------------------------------
+    # Returns the jobs for the patient
+    #--------------------------------------------------------------------------------
     def getJobs(self):
         return self.hour, self.minute
 
+    #--------------------------------------------------------------------------------
+    # Returns the duration of time required for the jobs of the patient
+    #--------------------------------------------------------------------------------
     def getDuration(self):
         totalHours = self.hour[-1] - self.hour[0]
         totalMinutes = self.minute[-1] - self.minute[0]
@@ -39,13 +60,17 @@ class Patient(object):
 #--------------------------------------------------------------------------------
 
 class Machine(object):
+    #--------------------------------------------------------------------------------
+    # Initialises the machine with an empty list of assigned patients
+    #--------------------------------------------------------------------------------
     def __init__(self):
         self.machinePatients = []
 
     #--------------------------------------------------------------------------------
     #
     #                           NOT FINISHED YET
-    #
+    # Current error is happening in here, not shifting patient times even though it
+    # is possible to do so
     #--------------------------------------------------------------------------------
 
     def canShiftPatient(self, Patient, patientPos, jobPos):
@@ -59,107 +84,87 @@ class Machine(object):
             machineMinutes.append(minutes)
 
         clashHour, clashMinute = machineHours[patientPos][jobPos], machineMinutes[patientPos][jobPos] #hour and minute of clash
+        otherHour, otherMinute = machineHours[patientPos][(jobPos + 1) % 2], machineMinutes[patientPos][(jobPos + 1) % 2]
         clash = True
 
         if clashHour < 12:  #clash happens in the morning
             maxHour = 11
-            minHour = 9
+            otherMaxHour = 2
         else:               #clash happens in the afternoon
             maxHour = 2
-            minHour = 12
+            otherMaxHour = 11
 
-        #Try going backwards to fix clash and fit into machine timetable
         while(clash):
-            clashMinute -= 15
-            if clashMinute < 0:
-                clashMinute = 45
-                clashHour -= 1
+            clashMinute += 15
+            otherMinute += 15
 
-            if clashHour < minHour:
+            if clashMinute == 60:
+                clashMinute = 0
+                clashHour += 1
+
+            if otherMinute == 60:
+                otherMinute = 0
+                otherHour += 1
+
+            if clashHour > maxHour or otherHour > otherMaxHour:
                 break
 
+            #Assume we have found a solution and check to see if so
+            clash = False
             #Solution found
-            if not any((hour == clashHour for hour in machineHours) and (minute == clashMinute for minute in machineMinutes)):
-                print("Solution found going backwards:")
-                clash = False
+            for i in range(len(machineHours)):
+                if clashHour == machineHours[i] and clashMinute == machineMinutes[i]:
+                    clash = True
+                    break #clash still found so try again
 
-        if not clash:
-            print("{}:{}".format(clashHour, clashMinute))
-            return True, clashHour, clashMinute
-
-        #Reset values back
-        clashHour, clashMinute = machineHours[patientPos][jobPos], machineMinutes[patientPos][jobPos] #reset the values since we couldn't find a space in one direction
-
-        #No solution found going backwards so try going forwards instead
+        #No solution found for this machine
         if clash:
-            while(clash):
-                clashHour += 15
-                if clashMinute == 60:
-                    clashMinute = 0
-                    clashHour += 1
+            print("No solution found, try next machine")
+            return False, None, None, None, None #Cannot find a space for the patient so try next machine
 
-                if clashHour > maxHour:
-                    break
-
-                #Solution found
-                if not any((hour == clashHour for hour in machineHours) and (minute == clashMinute for minute in machineMinutes)):
-                    print("Solution found going forwards:")
-                    clash = False
-
-            #No solution found for this machine
-            if clash:
-                print("No solution found, try next machine")
-                return False #Cannot find a space for the patient so try next machine
-
-            print("{}:{}".format(clashHour, clashMinute))
-            return True, clashHour, clashMinute
+        print("{}:{}".format(clashHour, clashMinute))
+        return True, clashHour, clashMinute, otherHour, otherMinute
 
     #--------------------------------------------------------------------------------
-    #
-    #                           NOT FINISHED YET
-    #
+    # Checks to see if the machine has a free slot at the given patient time
+    # Returns true if it does, false otherwise
     #--------------------------------------------------------------------------------
-    def isFree(self, Patient):
-        patientHours, patientMinutes = Patient.getJobs()
-        i = 0
+    def isFree(self, patient):
+            patientHours, patientMinutes = patient.getJobs()
 
-        for i in range(len(self.machinePatients)):
-            machineHours, machineMinutes = self.machinePatients[i].getJobs()
-            j = 0
+            for i in range(len(self.machinePatients)):
+                machineHours, machineMinutes = self.machinePatients[i].getJobs()
 
-            for j in range(len(patientHours)):
-                if patientHours[j] == machineHours[j] and patientMinutes[j] == machineMinutes[j]:
-                    print("CLASH ---- J{} ---- PH: {} PM: {} MH: {} MM: {}".format(j+1, patientHours[j], patientMinutes[j], machineHours[j], machineMinutes[j]))
+                for j in range(len(patientHours)):
+                    if patientHours[j] == machineHours[j] and patientMinutes[j] == machineMinutes[j]: #Either the morning or afternoon job clashes
+                        print("CLASH ---- J{} ---- PH: {} PM: {} MH: {} MM: {}".format(j+1, patientHours[j], patientMinutes[j], machineHours[j], machineMinutes[j]))
 
-                    if j == 0:
-                        print("J{} ---- PH: {} PM: {} MH: {} MM: {}".format(j+1, patientHours[j+1], patientMinutes[j+1], machineHours[j+1], machineMinutes[j+1]))
+                        if j == 0:
+                            print("J{} ---- PH: {} PM: {} MH: {} MM: {}".format(j+1, patientHours[j+1], patientMinutes[j+1], machineHours[j+1], machineMinutes[j+1]))
 
-                    else:
-                        print("J{} ---- PH: {} PM: {} MH: {} MM: {}".format(j, patientHours[j-1], patientMinutes[j-1], machineHours[j-1], machineMinutes[j-1]))
+                        else:
+                            print("J{} ---- PH: {} PM: {} MH: {} MM: {}".format(j, patientHours[j-1], patientMinutes[j-1], machineHours[j-1], machineMinutes[j-1]))
 
-                    #print("\nTrying to fix clash...")
-                    #canShift, newHour, newMinute = self.canShiftPatient(Patient, i, j)
+                        return False, i, j
 
-                    #if canShift:
-                        #print("FIXED")
-                        #print("old time -- {}:{}".format(Patient.hour[j], Patient.minute[j]))
-                        #Patient.hour[j] = newHour
-                        #Patient.minute[j] = newMinute
+            return True, None, None
 
-                        #print("new time -- {}:{}".format(Patient.hour[j], Patient.minute[j]))
-                        #return True
-
-                    return False
-
-        return True
-
+    #--------------------------------------------------------------------------------
+    # Returns the number of patients assigned to the machine
+    #--------------------------------------------------------------------------------
     def numPatients(self):
         return len(self.machinePatients)
 
+    #--------------------------------------------------------------------------------
+    # Adds the patient to the end of the machine's list
+    #--------------------------------------------------------------------------------
     def addPatient(self, Patient):
         numberOfPatients = self.numPatients()
         self.machinePatients.append(Patient)
 
+    #--------------------------------------------------------------------------------
+    # Returns the list of patients assigned to the machine
+    #--------------------------------------------------------------------------------
     def getPatients(self):
         return self.machinePatients
 
@@ -180,7 +185,9 @@ def partition(list, low, high):
     list[i+1], list[high] = list[high], list[i+1]
     return (i + 1)
 
-#Sorts the patients out into descending order of length of time required
+#--------------------------------------------------------------------------------
+# Sorts the patients out into descending order of length of time required
+#--------------------------------------------------------------------------------
 def quickSort(list, low, high):
     if low < high:
         pi = partition(list, low, high)
@@ -188,10 +195,10 @@ def quickSort(list, low, high):
         quickSort(list, low, pi - 1)
         quickSort(list, pi + 1, high)
 
-#----------------------------------------------------------------------------
-#Sort out patients trying to move them all to be from 9 - 12 or as early
-#as possible if restricted by afternoon time
-#----------------------------------------------------------------------------
+#--------------------------------------------------------------------------------
+# Sort out patients trying to move them all to be from 9 - 12 or as early as
+# possible if restricted by afternoon time
+#--------------------------------------------------------------------------------
 def sortPatientTimes(patients):
     for i in range(len(patients)):
         curPatient = patients[i]
@@ -210,11 +217,34 @@ def sortPatientTimes(patients):
                 tempMinutes[1] = 45
                 tempHours[1] -= 1
 
+        curPatient.overrideJobValues(tempHours[0], tempMinutes[0], tempHours[1], tempMinutes[1])
         print("to {}:{} - {}:{}".format(tempHours[0], tempMinutes[0], tempHours[1], tempMinutes[1]))
 
-# --------------------------------------------------
-#                    MAIN METHOD
-# --------------------------------------------------
+#--------------------------------------------------------------------------------
+# Tries to assign the patient to a machine, if possible it returns true
+# otherwise it returns false
+#--------------------------------------------------------------------------------
+def assignPatientToMachine(machine, patient):
+    free, scheduledPatientPos, jobPos = machine.isFree(patient)
+
+    if free:
+        machine.addPatient(patient)
+        print("Added patient")
+
+    else:
+        free, fixedJobHour, fixedJobMin, otherJobHour, otherJobMin = machine.canShiftPatient(patient, scheduledPatientPos, jobPos)
+
+        if free:
+            print("Shift possible, updating times")
+            patient.overrideJobValues(fixedJobHour, fixedJobMin, otherJobHour, otherJobMin)
+            print("Times updated")
+            machine.addPatient(patient)
+
+    return free
+
+#----------------------------------------------------------------------------
+#                           MAIN METHOD
+#----------------------------------------------------------------------------
 numPatients = 10
 numMachines = 2
 dayPatients = []
@@ -226,8 +256,6 @@ if len(sys.argv) > 1:
 
 if len(sys.argv) > 2:
     numMachines = int(sys.argv[2])
-
-i = 0
 
 for i in range(numPatients):
     dayPatients.append(Patient()) #Add patient to the list of total patients for the day
@@ -243,13 +271,64 @@ for i in range(numPatients):
     j = i % numMachines
     curMachine = dayMachines[j]
 
-    #if curMachine.isFree(dayPatients[i]):
-    curMachine.addPatient(dayPatients[i]);
+    success = assignPatientToMachine(curMachine, dayPatients[i])
+    k = j
+
+    while not success:
+        k += 1
+        k = k % numMachines
+
+        if j == k:
+            break
+
+        success = assignPatientToMachine(dayMachines[k], dayPatients[i])
+
+    if not success:
+        print("Could not find a free machine, create a new one")
+        #create a new machine
+
+    #free, scheduledPatientPos, jobPos = curMachine.isFree(dayPatients[i])
+
+    #if free:
+        #curMachine.addPatient(dayPatients[i])
+        #print("Added patient")
 
     #else:
-        #curMachine.canShiftPatient
+        #added, fixedJobHour, fixedJobMin, otherJobHour, otherJobMin = curMachine.canShiftPatient(dayPatients[i], scheduledPatientPos, jobPos)
+
+        #if added:
+            #print("Shift possible, updating times")
+            #dayPatients[i].overrideJobValues(fixedJobHour, fixedJobMin, otherJobHour, otherJobMin)
+            #print("Times updated")
+            #curMachine.addPatient(dayPatients[i])
+
+        #else:
+            #k = j
+            #k += 1
+            #if k > numMachines:
+                #k = 0
+
+            #while k != j:
+                #nextMachine = dayMachines[k] #Recursive, call isFree again and
+            #try next machine
         #j = i
         #print("Cannot add there is a clash")
+
+############################### COPIED CODE UNEDITED ###############################
+
+        #print("\nTrying to fix clash...")
+        #canShift, newHour, newMinute = self.canShiftPatient(Patient, i, j)
+
+        #if canShift:
+            #print("FIXED")
+            #print("old time -- {}:{}".format(Patient.hour[j], Patient.minute[j]))
+            #Patient.hour[j] = newHour
+            #Patient.minute[j] = newMinute
+
+            #print("new time -- {}:{}".format(Patient.hour[j], Patient.minute[j]))
+            #return True
+
+############################### COPIED CODE UNEDITED ###############################
 
 for i in range(numMachines):
     machine = dayMachines[i]
