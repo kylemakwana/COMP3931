@@ -67,10 +67,8 @@ class Machine(object):
         self.machinePatients = []
 
     #--------------------------------------------------------------------------------
-    #
-    #                           NOT FINISHED YET
-    # Current error is happening in here, not shifting patient times even though it
-    # is possible to do so
+    # Tries to shift the patient to see if the current machine can take on the job.
+    # If possible, returns true with values of new times otherwise returns false
     #--------------------------------------------------------------------------------
 
     def canShiftPatient(self, Patient, patientPos, jobPos):
@@ -276,6 +274,16 @@ for i in range(numMachines):
 quickSort(dayPatients, 0, numPatients - 1) #Sort patients by the total length of jobs decreasing
 sortPatientTimes(dayPatients)
 
+#----------------------------------------------------------------------------
+# Works but need to see if possible to balance machine workload
+#
+# Currently if one machine cant take job but next can it is given to the next
+# machine but, we then see if the next machine can take the new job it was
+# originally suppose to have.
+#
+# First check to see if previous machine can take the new job to try and
+# help balance the workload.
+#----------------------------------------------------------------------------
 for i in range(numPatients):
     j = i % numMachines
     curMachine = dayMachines[j]
