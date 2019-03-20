@@ -89,9 +89,9 @@ class Machine(object):
 
         if clashHour < 12:  #clash happens in the morning
             maxHour = 11
-            otherMaxHour = 2
+            otherMaxHour = 14
         else:               #clash happens in the afternoon
-            maxHour = 2
+            maxHour = 14
             otherMaxHour = 11
 
         while(clash):
@@ -111,9 +111,11 @@ class Machine(object):
 
             #Assume we have found a solution and check to see if so
             clash = False
-            #Solution found
+            print(len(machineHours))
+
             for i in range(len(machineHours)):
                 if clashHour == machineHours[i] and clashMinute == machineMinutes[i]:
+                    print("Clash at {}:{}".format(machineHours[i], machineMinutes[i]))
                     clash = True
                     break #clash still found so try again
 
@@ -137,13 +139,13 @@ class Machine(object):
 
                 for j in range(len(patientHours)):
                     if patientHours[j] == machineHours[j] and patientMinutes[j] == machineMinutes[j]: #Either the morning or afternoon job clashes
-                        print("CLASH ---- J{} ---- PH: {} PM: {} MH: {} MM: {}".format(j+1, patientHours[j], patientMinutes[j], machineHours[j], machineMinutes[j]))
+                        #print("CLASH ---- J{} ---- PH: {} PM: {} MH: {} MM: {}".format(j+1, patientHours[j], patientMinutes[j], machineHours[j], machineMinutes[j]))
 
-                        if j == 0:
-                            print("J{} ---- PH: {} PM: {} MH: {} MM: {}".format(j+1, patientHours[j+1], patientMinutes[j+1], machineHours[j+1], machineMinutes[j+1]))
+                        #if j == 0:
+                            #print("J{} ---- PH: {} PM: {} MH: {} MM: {}".format(j+1, patientHours[j+1], patientMinutes[j+1], machineHours[j+1], machineMinutes[j+1]))
 
-                        else:
-                            print("J{} ---- PH: {} PM: {} MH: {} MM: {}".format(j, patientHours[j-1], patientMinutes[j-1], machineHours[j-1], machineMinutes[j-1]))
+                        #else:
+                            #print("J{} ---- PH: {} PM: {} MH: {} MM: {}".format(j, patientHours[j-1], patientMinutes[j-1], machineHours[j-1], machineMinutes[j-1]))
 
                         return False, i, j
 
