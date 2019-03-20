@@ -123,7 +123,7 @@ class Machine(object):
             print("No solution found, try next machine")
             return False, None, None, None, None #Cannot find a space for the patient so try next machine
 
-        print("{}:{}".format(clashHour, clashMinute))
+        print("Free time found at {}:{}".format(clashHour, clashMinute))
 
         if clashHour < 12:
             return True, clashHour, clashMinute, otherHour, otherMinute
@@ -209,7 +209,6 @@ def sortPatientTimes(patients):
     for i in range(len(patients)):
         curPatient = patients[i]
         tempHours, tempMinutes = curPatient.getJobs()
-        print("Times changed from: {}:{} - {}:{}".format(tempHours[0], tempMinutes[0], tempHours[1], tempMinutes[1]))
 
         while not((tempHours[0] == 9 and tempMinutes[0] == 0) or (tempHours[1] == 12 and tempMinutes[1] == 0)): #Jobs can be moved, not at the minimum
             tempMinutes[0] -= 15
@@ -224,7 +223,6 @@ def sortPatientTimes(patients):
                 tempHours[1] -= 1
 
         curPatient.overrideJobValues(tempHours[0], tempMinutes[0], tempHours[1], tempMinutes[1])
-        print("to {}:{} - {}:{}".format(tempHours[0], tempMinutes[0], tempHours[1], tempMinutes[1]))
 
 #--------------------------------------------------------------------------------
 # Tries to assign the patient to a machine, if possible it returns true
@@ -299,6 +297,10 @@ for i in range(numPatients):
             break
 
         success = assignPatientToMachine(dayMachines[k], dayPatients[i])
+
+        if success:
+            print("Trying same machine again for workload balance")
+            i -= 1
 
     if not success:
         print("Could not find a free machine, create a new one")
