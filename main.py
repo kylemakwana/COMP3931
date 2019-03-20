@@ -111,13 +111,14 @@ class Machine(object):
 
             #Assume we have found a solution and check to see if so
             clash = False
-            print(len(machineHours))
 
             for i in range(len(machineHours)):
-                if clashHour == machineHours[i] and clashMinute == machineMinutes[i]:
-                    print("Clash at {}:{}".format(machineHours[i], machineMinutes[i]))
-                    clash = True
-                    break #clash still found so try again
+                for j in range(len(machineHours[i])):
+                    #print("Checking time {}:{} to machine time {}:{}".format(clashHour, clashMinute, machineHours[i][j], machineMinutes[i][j]))
+                    if clashHour == machineHours[i][j] and clashMinute == machineMinutes[i][j]:
+                        #print("Clash at {}:{}".format(machineHours[i][j], machineMinutes[i][j]))
+                        clash = True
+                        break #clash still found so try again
 
         #No solution found for this machine
         if clash:
@@ -125,7 +126,12 @@ class Machine(object):
             return False, None, None, None, None #Cannot find a space for the patient so try next machine
 
         print("{}:{}".format(clashHour, clashMinute))
-        return True, clashHour, clashMinute, otherHour, otherMinute
+
+        if clashHour < 12:
+            return True, clashHour, clashMinute, otherHour, otherMinute
+
+        #Afternoon clash so return values in other order
+        return True, otherHour, otherMinute, clashHour, clashMinute
 
     #--------------------------------------------------------------------------------
     # Checks to see if the machine has a free slot at the given patient time
@@ -241,6 +247,7 @@ def assignPatientToMachine(machine, patient):
             patient.overrideJobValues(fixedJobHour, fixedJobMin, otherJobHour, otherJobMin)
             print("Times updated")
             machine.addPatient(patient)
+            print("Added patient")
 
     return free
 
@@ -343,5 +350,5 @@ for i in range(numMachines):
 
         for k in range(2):
             hours, minutes = machine.getPatients()[j].getJobs()
-            print("J: {} H: {} M: {}".format(k+1, hours[k], minutes[k]))
+            print("J{} H: {} M: {}".format(k+1, hours[k], minutes[k]))
         print("")
