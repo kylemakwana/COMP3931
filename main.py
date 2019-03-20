@@ -251,7 +251,7 @@ def assignPatientToMachine(machine, patient):
 #                           MAIN METHOD
 #----------------------------------------------------------------------------
 numPatients = 10
-numMachines = 2
+numMachines = 1
 dayPatients = []
 dayMachines = []
 
@@ -283,7 +283,7 @@ sortPatientTimes(dayPatients)
 # help balance the workload.
 #----------------------------------------------------------------------------
 for i in range(numPatients):
-    j = i % numMachines
+    j = i % len(dayMachines)
     curMachine = dayMachines[j]
 
     success = assignPatientToMachine(curMachine, dayPatients[i])
@@ -291,19 +291,18 @@ for i in range(numPatients):
 
     while not success:
         k += 1
-        k = k % numMachines
+        k = k % len(dayMachines)
 
         if j == k:
             break
 
         success = assignPatientToMachine(dayMachines[k], dayPatients[i])
 
-        if success:
-            print("Trying same machine again for workload balance")
-            i -= 1
-
     if not success:
         print("Could not find a free machine, create a new one")
+        dayMachines.append(Machine())
+        assignPatientToMachine(dayMachines[-1], dayPatients[i])
+        print("Created new machine and added patient")
         #create a new machine
 
     #free, scheduledPatientPos, jobPos = curMachine.isFree(dayPatients[i])
@@ -349,7 +348,7 @@ for i in range(numPatients):
 
 ############################### COPIED CODE UNEDITED ###############################
 
-for i in range(numMachines):
+for i in range(len(dayMachines)):
     machine = dayMachines[i]
     print("----------------- Machine {} -----------------".format(i+1))
     j = 0
