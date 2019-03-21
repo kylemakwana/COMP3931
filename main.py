@@ -350,7 +350,12 @@ for i in range(numPatients):
 
 for i in range(len(dayMachines)):
     machine = dayMachines[i]
-    print("----------------- Machine {} -----------------".format(i+1))
+    if i+1 > numMachines:
+        print("----------------- Contract Nurse {} -----------------".format(i+1 - numMachines))
+
+    else:
+        print("----------------- Nurse {} -----------------".format(i+1))
+
     j = 0
 
     for j in range(machine.numPatients()):
