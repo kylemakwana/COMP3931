@@ -70,7 +70,6 @@ class Machine(object):
     # Tries to shift the patient to see if the current machine can take on the job.
     # If possible, returns true with values of new times otherwise returns false
     #--------------------------------------------------------------------------------
-
     def canShiftPatient(self, Patient, patientPos, jobPos):
         patientHours, patientMinutes = Patient.getJobs()
         machineHours, machineMinutes = [], []
@@ -120,10 +119,10 @@ class Machine(object):
 
         #No solution found for this machine
         if clash:
-            print("No solution found, try next machine")
+            #print("No solution found, try next machine")
             return False, None, None, None, None #Cannot find a space for the patient so try next machine
 
-        print("Free time found at {}:{}".format(clashHour, clashMinute))
+        #print("Free time found at {}:{}".format(clashHour, clashMinute))
 
         if clashHour < 12:
             return True, clashHour, clashMinute, otherHour, otherMinute
@@ -233,17 +232,17 @@ def assignPatientToMachine(machine, patient):
 
     if free:
         machine.addPatient(patient)
-        print("Added patient")
+        #print("Added patient")
 
     else:
         free, fixedJobHour, fixedJobMin, otherJobHour, otherJobMin = machine.canShiftPatient(patient, scheduledPatientPos, jobPos)
 
         if free:
-            print("Shift possible, updating times")
+            #print("Shift possible, updating times")
             patient.overrideJobValues(fixedJobHour, fixedJobMin, otherJobHour, otherJobMin)
-            print("Times updated")
+            #print("Times updated")
             machine.addPatient(patient)
-            print("Added patient")
+            #print("Added patient")
 
     return free
 
@@ -299,54 +298,10 @@ for i in range(numPatients):
         success = assignPatientToMachine(dayMachines[k], dayPatients[i])
 
     if not success:
-        print("Could not find a free machine, create a new one")
+        #print("Could not find a free machine, create a new one")
         dayMachines.append(Machine())
         assignPatientToMachine(dayMachines[-1], dayPatients[i])
-        print("Created new machine and added patient")
-        #create a new machine
-
-    #free, scheduledPatientPos, jobPos = curMachine.isFree(dayPatients[i])
-
-    #if free:
-        #curMachine.addPatient(dayPatients[i])
-        #print("Added patient")
-
-    #else:
-        #added, fixedJobHour, fixedJobMin, otherJobHour, otherJobMin = curMachine.canShiftPatient(dayPatients[i], scheduledPatientPos, jobPos)
-
-        #if added:
-            #print("Shift possible, updating times")
-            #dayPatients[i].overrideJobValues(fixedJobHour, fixedJobMin, otherJobHour, otherJobMin)
-            #print("Times updated")
-            #curMachine.addPatient(dayPatients[i])
-
-        #else:
-            #k = j
-            #k += 1
-            #if k > numMachines:
-                #k = 0
-
-            #while k != j:
-                #nextMachine = dayMachines[k] #Recursive, call isFree again and
-            #try next machine
-        #j = i
-        #print("Cannot add there is a clash")
-
-############################### COPIED CODE UNEDITED ###############################
-
-        #print("\nTrying to fix clash...")
-        #canShift, newHour, newMinute = self.canShiftPatient(Patient, i, j)
-
-        #if canShift:
-            #print("FIXED")
-            #print("old time -- {}:{}".format(Patient.hour[j], Patient.minute[j]))
-            #Patient.hour[j] = newHour
-            #Patient.minute[j] = newMinute
-
-            #print("new time -- {}:{}".format(Patient.hour[j], Patient.minute[j]))
-            #return True
-
-############################### COPIED CODE UNEDITED ###############################
+        #print("Created new machine and added patient")
 
 for i in range(len(dayMachines)):
     machine = dayMachines[i]
