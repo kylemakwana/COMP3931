@@ -253,7 +253,6 @@ numPatients = 10
 numMachines = 2
 dayPatients = []
 dayMachines = []
-text = ""
 
 #Override the default values for the number of patients and the number of machines
 #Also can read the first argument as a text file and parse it for testing
@@ -262,10 +261,9 @@ if len(sys.argv) > 1:
         numPatients = int(sys.argv[1])
 
     elif isinstance(sys.argv[1], str):
-        text = sys.argv[1]
         numPatients = 0
 
-        with open(text, 'r') as f:
+        with open(sys.argv[1], 'r') as f:
             contents = f.read().split(',')
             #print(contents)
             i = 0
@@ -297,7 +295,7 @@ for i in range(numPatients):
 for i in range(numMachines):
     dayMachines.append(Machine()) #Add machine to the list of total machines for the day
 
-quickSort(dayPatients, 0, numPatients - 1) #Sort patients by the total length of jobs decreasing
+quickSort(dayPatients, 0, len(dayPatients) - 1) #Sort patients by the total length of jobs decreasing
 
 #for i in range(len(dayPatients)):
     #hours, minutes = dayPatients[i].getJobs()
