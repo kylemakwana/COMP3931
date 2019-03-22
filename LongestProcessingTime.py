@@ -249,109 +249,113 @@ def assignPatientToMachine(machine, patient):
 #----------------------------------------------------------------------------
 #                           MAIN METHOD
 #----------------------------------------------------------------------------
-numPatients = 10
-numMachines = 1
-dayPatients = []
-dayMachines = []
+def main():
+    numPatients = 10
+    numMachines = 1
+    dayPatients = []
+    dayMachines = []
 
-#Override the default values for the number of patients and the number of machines
-#Also can read the first argument as a text file and parse it for testing
-if len(sys.argv) > 1:
-    if isinstance(sys.argv[1], int):
-        numPatients = int(sys.argv[1])
+    #Override the default values for the number of patients and the number of machines
+    #Also can read the first argument as a text file and parse it for testing
+    if len(sys.argv) > 1:
+        if isinstance(sys.argv[1], int):
+            numPatients = int(sys.argv[1])
 
-    elif isinstance(sys.argv[1], str):
-        numPatients = 0
+        elif isinstance(sys.argv[1], str):
+            numPatients = 0
 
-        with open(sys.argv[1], 'r') as f:
-            contents = f.read().split(',')
-            #print(contents)
-            i = 0
-            while i < len(contents):
-                if i % 4 == 0:
-                    p = Patient()
-                    p.hour.append(int(contents[i]))
+            with open(sys.argv[1], 'r') as f:
+                contents = f.read().split(',')
+                #print(contents)
+                i = 0
+                while i < len(contents):
+                    if i % 4 == 0:
+                        p = Patient()
+                        p.hour.append(int(contents[i]))
 
-                elif i % 4 == 1:
-                    p.minute.append(int(contents[i]))
+                    elif i % 4 == 1:
+                        p.minute.append(int(contents[i]))
 
-                elif i % 4 == 2:
-                    p.hour.append(int(contents[i]))
+                    elif i % 4 == 2:
+                        p.hour.append(int(contents[i]))
 
-                else:
-                    p.minute.append(int(contents[i]))
-                    #print(p.hour)
-                    #print(p.minute)
-                    dayPatients.append(p)
-                i += 1
+                    else:
+                        p.minute.append(int(contents[i]))
+                        #print(p.hour)
+                        #print(p.minute)
+                        dayPatients.append(p)
+                    i += 1
 
-if len(sys.argv) > 2:
-    numMachines = int(sys.argv[2])
+    if len(sys.argv) > 2:
+        numMachines = int(sys.argv[2])
 
-for i in range(numPatients):
-    dayPatients.append(Patient()) #Add patient to the list of total patients for the day
-    dayPatients[i].setJobValues() #Create the times for the patient
+    for i in range(numPatients):
+        dayPatients.append(Patient()) #Add patient to the list of total patients for the day
+        dayPatients[i].setJobValues() #Create the times for the patient
 
-for i in range(numMachines):
-    dayMachines.append(Machine()) #Add machine to the list of total machines for the day
+    for i in range(numMachines):
+        dayMachines.append(Machine()) #Add machine to the list of total machines for the day
 
-quickSort(dayPatients, 0, len(dayPatients) - 1) #Sort patients by the total length of jobs decreasing
+    quickSort(dayPatients, 0, len(dayPatients) - 1) #Sort patients by the total length of jobs decreasing
 
-#for i in range(len(dayPatients)):
-    #hours, minutes = dayPatients[i].getJobs()
-    #print("----------------- Patient {} -----------------".format(i+1))
-    #for j in range(len(hours)):
-        #print("J{} H: {} M: {}".format(j+1, hours[j], minutes[j]))
+    #for i in range(len(dayPatients)):
+        #hours, minutes = dayPatients[i].getJobs()
+        #print("----------------- Patient {} -----------------".format(i+1))
+        #for j in range(len(hours)):
+            #print("J{} H: {} M: {}".format(j+1, hours[j], minutes[j]))
 
-sortPatientTimes(dayPatients)
+    sortPatientTimes(dayPatients)
 
-#----------------------------------------------------------------------------
-# Works but need to see if possible to balance machine workload
-#
-# Currently if one machine cant take job but next can it is given to the next
-# machine but, we then see if the next machine can take the new job it was
-# originally suppose to have.
-#
-# First check to see if previous machine can take the new job to try and
-# help balance the workload.
-#----------------------------------------------------------------------------
-for i in range(len(dayPatients)):
-    j = i % len(dayMachines)
-    curMachine = dayMachines[j]
+    #----------------------------------------------------------------------------
+    # Works but need to see if possible to balance machine workload
+    #
+    # Currently if one machine cant take job but next can it is given to the next
+    # machine but, we then see if the next machine can take the new job it was
+    # originally suppose to have.
+    #
+    # First check to see if previous machine can take the new job to try and
+    # help balance the workload.
+    #----------------------------------------------------------------------------
+    for i in range(len(dayPatients)):
+        j = i % len(dayMachines)
+        curMachine = dayMachines[j]
 
-    success = assignPatientToMachine(curMachine, dayPatients[i])
-    k = j
+        success = assignPatientToMachine(curMachine, dayPatients[i])
+        k = j
 
-    while not success:
-        k += 1
-        k = k % len(dayMachines)
+        while not success:
+            k += 1
+            k = k % len(dayMachines)
 
-        if j == k:
-            break
+            if j == k:
+                break
 
-        success = assignPatientToMachine(dayMachines[k], dayPatients[i])
+            success = assignPatientToMachine(dayMachines[k], dayPatients[i])
 
-    if not success:
-        #print("Could not find a free machine, create a new one")
-        dayMachines.append(Machine())
-        assignPatientToMachine(dayMachines[-1], dayPatients[i])
-        #print("Created new machine and added patient")
+        if not success:
+            #print("Could not find a free machine, create a new one")
+            dayMachines.append(Machine())
+            assignPatientToMachine(dayMachines[-1], dayPatients[i])
+            #print("Created new machine and added patient")
 
-for i in range(len(dayMachines)):
-    machine = dayMachines[i]
-    if i+1 > numMachines:
-        print("----------------- Contract Nurse {} -----------------".format(i+1 - numMachines))
+    for i in range(len(dayMachines)):
+        machine = dayMachines[i]
+        if i+1 > numMachines:
+            print("----------------- Contract Nurse {} -----------------".format(i+1 - numMachines))
 
-    else:
-        print("----------------- Nurse {} -----------------".format(i+1))
+        else:
+            print("----------------- Nurse {} -----------------".format(i+1))
 
-    j = 0
+        j = 0
 
-    for j in range(machine.numPatients()):
-        print("----------------- Patient {} -----------------".format(j+1))
-        k = 0
+        for j in range(machine.numPatients()):
+            print("----------------- Patient {} -----------------".format(j+1))
+            k = 0
 
-        for k in range(2):
-            hours, minutes = machine.getPatients()[j].getJobs()
-            print("J{} H: {} M: {}".format(k+1, hours[k], minutes[k]))
-        print("")
+            for k in range(2):
+                hours, minutes = machine.getPatients()[j].getJobs()
+                print("J{} H: {} M: {}".format(k+1, hours[k], minutes[k]))
+            print("")
+
+if __name__ == '__main__':
+    main()
