@@ -255,8 +255,35 @@ dayPatients = []
 dayMachines = []
 
 #Override the default values for the number of patients and the number of machines
+#Also can read the first argument as a text file and parse it for testing
 if len(sys.argv) > 1:
-    numPatients = int(sys.argv[1])
+    if isinstance(sys.argv[1], int):
+        numPatients = int(sys.argv[1])
+
+    elif isinstance(sys.argv[1], str):
+        numPatients = 0
+
+        with open(sys.argv[1], 'r') as f:
+            contents = f.read().split(',')
+            #print(contents)
+            i = 0
+            while i < len(contents):
+                if i % 4 == 0:
+                    p = Patient()
+                    p.hour.append(int(contents[i]))
+
+                elif i % 4 == 1:
+                    p.minute.append(int(contents[i]))
+
+                elif i % 4 == 2:
+                    p.hour.append(int(contents[i]))
+
+                else:
+                    p.minute.append(int(contents[i]))
+                    #print(p.hour)
+                    #print(p.minute)
+                    dayPatients.append(p)
+                i += 1
 
 if len(sys.argv) > 2:
     numMachines = int(sys.argv[2])
@@ -268,7 +295,14 @@ for i in range(numPatients):
 for i in range(numMachines):
     dayMachines.append(Machine()) #Add machine to the list of total machines for the day
 
-quickSort(dayPatients, 0, numPatients - 1) #Sort patients by the total length of jobs decreasing
+quickSort(dayPatients, 0, len(dayPatients) - 1) #Sort patients by the total length of jobs decreasing
+
+#for i in range(len(dayPatients)):
+    #hours, minutes = dayPatients[i].getJobs()
+    #print("----------------- Patient {} -----------------".format(i+1))
+    #for j in range(len(hours)):
+        #print("J{} H: {} M: {}".format(j+1, hours[j], minutes[j]))
+
 sortPatientTimes(dayPatients)
 
 #----------------------------------------------------------------------------
@@ -281,7 +315,7 @@ sortPatientTimes(dayPatients)
 # First check to see if previous machine can take the new job to try and
 # help balance the workload.
 #----------------------------------------------------------------------------
-for i in range(numPatients):
+for i in range(len(dayPatients)):
     j = i % len(dayMachines)
     curMachine = dayMachines[j]
 
