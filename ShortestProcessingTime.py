@@ -267,7 +267,7 @@ if len(sys.argv) > 1:
 
         with open(text, 'r') as f:
             contents = f.read().split(',')
-            print(contents)
+            #print(contents)
             i = 0
             while i < len(contents):
                 if i % 4 == 0:
@@ -282,8 +282,8 @@ if len(sys.argv) > 1:
 
                 else:
                     p.minute.append(int(contents[i]))
-                    print(p.hour)
-                    print(p.minute)
+                    #print(p.hour)
+                    #print(p.minute)
                     dayPatients.append(p)
                 i += 1
 
