@@ -80,8 +80,8 @@ class Machine(object):
             machineHours.append(hours)
             machineMinutes.append(minutes)
 
-        clashHour, clashMinute = machineHours[patientPos][jobPos], machineMinutes[patientPos][jobPos] #hour and minute of clash
-        otherHour, otherMinute = machineHours[patientPos][(jobPos + 1) % 2], machineMinutes[patientPos][(jobPos + 1) % 2]
+        clashHour, clashMinute = patientHours[jobPos], patientMinutes[jobPos] #hour and minute of clash
+        otherHour, otherMinute = patientHours[(jobPos + 1) % 2], patientMinutes[(jobPos + 1) % 2]
         clash = True
 
         if clashHour < 12:  #clash happens in the morning
