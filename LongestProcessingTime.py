@@ -106,8 +106,6 @@ class Machine(object):
             operations = self.machinePatients[i].getOperations()
             machineOperations.append(operations)
 
-        #print(machineOperations)
-
         clashOperation = patientOperations[operationPos] #time of the clash
         otherOperation = patientOperations[(operationPos + 1) % 2]
         clash = True
@@ -124,18 +122,18 @@ class Machine(object):
 
             for i in range(len(machineOperations)):
                 for j in range(len(machineOperations[i])):
-                    #print("Checking time {}:{} to machine time {}:{}".format(clashHour, clashMinute, machineHours[i][j], machineMinutes[i][j]))
-                    if clashOperation == machineOperations[i][j]:
-                        #print("Clash at {}:{}".format(machineHours[i][j], machineMinutes[i][j]))
+                    #print("Checking times {} and {} to machine time {}".format(clashOperation, otherOperation, machineOperations[i][j]))
+                    if (clashOperation == machineOperations[i][j]) or (otherOperation == machineOperations[i][j]):
+                        #print("Clash at {}\n".format(machineOperations[i][j]))
                         clash = True
                         break #clash still found so try again
 
         #No solution found for this machine
         if clash:
-            #print("No solution found, try next machine")
+            #print("No solution found, try next machine\n")
             return False, None, None #Cannot find a space for the patient so try next machine
 
-        #print("Free time found at {}:{}".format(clashHour, clashMinute))
+        #print("Free times found at {} and {}\n".format(clashOperation, otherOperation))
 
         return True, clashOperation, otherOperation
 
@@ -151,14 +149,6 @@ class Machine(object):
 
                 for j in range(len(patientOperations)):
                     if any(op == patientOperations[j] for op in machineOperations): #Either the morning or afternoon job clashes
-                        #print("CLASH ---- O{} ---- PO: {} MO: {}".format(j+1, patientOperations[j], machineOperations[j]))
-
-                        #if j == 0:
-                            #print("J{} ---- PH: {} PM: {} MH: {} MM: {}".format(j+1, patientHours[j+1], patientMinutes[j+1], machineHours[j+1], machineMinutes[j+1]))
-
-                        #else:
-                            #print("J{} ---- PH: {} PM: {} MH: {} MM: {}".format(j, patientHours[j-1], patientMinutes[j-1], machineHours[j-1], machineMinutes[j-1]))
-
                         return False, i, j
 
             return True, None, None
@@ -218,17 +208,14 @@ def assignPatientToMachine(machine, patient):
 
     if free:
         machine.addPatient(patient)
-        #print("Added patient")
 
     else:
         free, fixedOperation, otherOperation = machine.canShiftPatient(patient, scheduledPatientPos, operationPos)
 
         if free:
-            #print("Shift possible, updating times")
             patient.overrideOperationValues(fixedOperation, otherOperation)
-            #print("Times updated")
             machine.addPatient(patient)
-            #print("Added patient")
+            #print("Added patient\n")
 
     return free
 
