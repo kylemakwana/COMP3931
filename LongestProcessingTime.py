@@ -1,4 +1,4 @@
-import random, sys, math
+import random, sys, math, time
 
 #--------------------------------------------------------------------------------
 #
@@ -223,6 +223,7 @@ def assignPatientToMachine(machine, patient):
 #                           MAIN METHOD
 #----------------------------------------------------------------------------
 def main():
+    startTime = time.time()
     numPatients = 10
     numMachines = 1
     dayPatients = []
@@ -331,6 +332,10 @@ def main():
                 operations = machine.getPatients()[j].getOperations()
                 print("O{} T: {}".format(k+1, operations[k]))
             print("")
+
+    endTime = time.time()
+    duration = endTime - startTime
+    print("Duration of heuristic: {} seconds".format(duration))
 
 if __name__ == '__main__':
     main()
