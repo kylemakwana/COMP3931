@@ -234,10 +234,11 @@ def main():
     #Override the default values for the number of patients and the number of nurses
     #Also can read the first argument as a text file and parse it for testing
     if len(sys.argv) > 1:
-        if isinstance(sys.argv[1], int):
+        try:
+            int(sys.argv[1])
             numPatients = int(sys.argv[1])
 
-        elif isinstance(sys.argv[1], str):
+        except ValueError:
             with open(sys.argv[1], 'r') as f:
                 contents = f.read().split(',')
 
