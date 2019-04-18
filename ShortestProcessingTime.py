@@ -346,7 +346,7 @@ def main():
                 print("O{} T: {}".format(k+1, operations[k]))
             print("")
 
-    print("Duration of heuristic: {} seconds".format(duration))
+    print("Duration of heuristic: {} ms".format(duration))
 
 if __name__ == '__main__':
     main()
