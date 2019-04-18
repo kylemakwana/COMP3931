@@ -325,7 +325,7 @@ def main():
                 assignPatientToNurse(dayNurses[-1], dayPatients[i])
 
     endTime = time.time()
-    duration = endTime - startTime
+    duration = (endTime - startTime) * 1000
 
     for i in range(len(dayNurses)):
         nurse = dayNurses[i]
