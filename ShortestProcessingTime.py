@@ -32,8 +32,8 @@ class Patient(object):
 
         self.operations.append(secondOperation)
 
-        for i in range(len(self.operations)):
-            print("O{} - Time: {}".format(i+1, self.operations[i]))
+        #for i in range(len(self.operations)):
+            #print("O{} - Time: {}".format(i+1, self.operations[i]))
 
     #--------------------------------------------------------------------------------
     # Randomly chooses a time lag which will then be used to determine the time
@@ -51,7 +51,7 @@ class Patient(object):
 
             self.timeLag = hours + minutes
 
-        print("\n{}".format(self.timeLag))
+        #print("\n{}".format(self.timeLag))
         self.setOperationValues()
 
     #--------------------------------------------------------------------------------
