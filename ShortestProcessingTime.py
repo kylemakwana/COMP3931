@@ -243,9 +243,16 @@ def main():
                 contents = f.read().split(',')
 
                 for i in range(len(contents)):
-                        p = Patient()
-                        p.timeLag = (float(contents[i]))
-                        dayPatients.append(p)
+                    p = Patient()
+                    l = float(contents[i])
+
+                    if l > 5.5:
+                        l = 5.5
+
+                    p.timeLag = (l)
+                    dayPatients.append(p)
+
+                numPatients = len(dayPatients)
 
     if len(sys.argv) > 2:
         numNurses = int(sys.argv[2])
