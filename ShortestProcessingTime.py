@@ -317,6 +317,9 @@ def main():
                 dayNurses.append(Nurse())
                 assignPatientToNurse(dayNurses[-1], dayPatients[i])
 
+    endTime = time.time()
+    duration = endTime - startTime
+
     for i in range(len(dayNurses)):
         nurse = dayNurses[i]
         if i+1 > numNurses:
@@ -336,8 +339,6 @@ def main():
                 print("O{} T: {}".format(k+1, operations[k]))
             print("")
 
-    endTime = time.time()
-    duration = endTime - startTime
     print("Duration of heuristic: {} seconds".format(duration))
 
 if __name__ == '__main__':
