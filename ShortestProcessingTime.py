@@ -179,27 +179,40 @@ class Nurse(object):
 #                           MAIN FUNCTIONS
 #
 #--------------------------------------------------------------------------------
-def partition(list, low, high):
-    i = low - 1
-    pivot = list[high]
-
-    for j in range(low, high):
-        if list[j].getDuration() <= pivot.getDuration(): #Change inequality sign to reverse the list
-            i = i + 1
-            list[i], list[j] = list[j], list[i]
-
-    list[i+1], list[high] = list[high], list[i+1]
-    return (i + 1)
-
 #--------------------------------------------------------------------------------
 # Sorts the patients out into descending order of length of time required
 #--------------------------------------------------------------------------------
-def quickSort(list, low, high):
-    if low < high:
-        pi = partition(list, low, high)
+def mergeSort(list):
+    if len(list) >1:
+        mid = len(list)//2 #Finding the mid of the array
+        L = list[:mid] # Dividing the array elements
+        R = list[mid:] # into 2 halves
 
-        quickSort(list, low, pi - 1)
-        quickSort(list, pi + 1, high)
+        mergeSort(L) # Sorting the first half
+        mergeSort(R) # Sorting the second half
+
+        i = j = k = 0
+
+        # Copy data to temp arrays L[] and R[]
+        while i < len(L) and j < len(R):
+            if L[i].getDuration() < R[j].getDuration():
+                list[k] = L[i]
+                i += 1
+            else:
+                list[k] = R[j]
+                j += 1
+            k += 1
+
+        # Checking if any element was left
+        while i < len(L):
+            list[k] = L[i]
+            i+=1
+            k+=1
+
+        while j < len(R):
+            list[k] = R[j]
+            j += 1
+            k += 1
 
 #--------------------------------------------------------------------------------
 # Tries to assign the patient to a nurse, if possible it returns true
@@ -266,7 +279,7 @@ def main():
     for i in range(numNurses):
         dayNurses.append(Nurse()) #Add nurse to the list of total nurses for the day
 
-    quickSort(dayPatients, 0, len(dayPatients) - 1) #Sort patients by the time lag decreasing
+    mergeSort(dayPatients) #Sort patients by the time lag decreasing
 
     #for i in range(len(dayPatients)):
         #hours, minutes = dayPatients[i].getJobs()
