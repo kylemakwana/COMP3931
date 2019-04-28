@@ -6,7 +6,7 @@ This project has been made open source but, if any future development is to be d
 # Requirements to Run the Heuristic
 Python 3
 
-# Running the heuristic
+# Running the Heuristic
 * Clone the repository
 * Open the command line and move into the directory of the clone repository
 * Type either 'Python LongestProcessingTime.py' or 'Python ShortestProcessingTime.py' depending on if you want to use LPT or SPT
